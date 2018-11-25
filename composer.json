@@ -1,0 +1,32 @@
+{
+  "name": "trixpua/shipping",
+  "description": "Shipping is a set of classes optimized to get shipping quotes and tracking information from some Brazilian shipping companies",
+  "keywords": [
+    "Trixpua",
+    "Shipping",
+    "TNT",
+    "Jamef",
+    "JadLog",
+    "Correios",
+    "Tam"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Elizandro Echer",
+      "email": "trix.pua@msn.com",
+      "homepage": "https://www.devbay.com.br",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "php": "^7.2",
+    "guzzlehttp/guzzle": "^6.3",
+    "meng-tian/async-soap-guzzle": "^0.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "Trixpua\\Shipping\\": "src/"
+    }
+  }
+}
