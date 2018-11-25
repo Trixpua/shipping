@@ -17,7 +17,7 @@ var_dump($return);
 if ($return->status === 'OK') {
     if (!$return->dataEntrega) {
         echo "<p>The current status is {$return->localizacao} and the estimated delivery time is {$return->previsaoEntrega}</p>";
-    }else {
+    } else {
         echo "<p>The current status is {$return->localizacao} the item was delivery in {$return->dataEntrega}</p>";
     }
 
