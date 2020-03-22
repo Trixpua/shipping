@@ -11,7 +11,7 @@ use Meng\AsyncSoap\Guzzle\Factory;
  * Class Jadlog
  * @author Elizandro Echer <https://github.com/Trixpua>
  * @package Trixpua\Shipping
- * @version 1.0.0
+ * @version 2.0.0
  */
 class Jadlog
 {
@@ -80,7 +80,7 @@ class Jadlog
     {
         $factory = new Factory();
         $client = $factory->create(new Client(),
-            'http://www.jadlog.com.br:8080/JadlogEdiWs/services/TrackingBean?wsdl');
+            'http://201.63.135.178:8080/JadlogEdiWs/services/TrackingBean?wsdl');
         try {
             $promise = $client->callAsync('consultar', $this->buildRequest())->then(function($response) {
                 $this->parseResult($response);
@@ -117,28 +117,26 @@ class Jadlog
 
         if (!$xml->Jadlog_Tracking_Consultar->Mensagem) {
             $this->result->status = 'OK';
-            $this->result->Numero = (string)trim($xml->Jadlog_Tracking_Consultar->ND->Numero);
+            $this->result->number = (string)trim($xml->Jadlog_Tracking_Consultar->ND->Numero);
             $this->result->lastStatus = (string)trim($xml->Jadlog_Tracking_Consultar->ND->Status);
-            $this->result->DataHoraEntrega = (string)trim($xml->Jadlog_Tracking_Consultar->ND->DataHoraEntrega);
-            $this->result->Recebedor = (string)trim($xml->Jadlog_Tracking_Consultar->ND->Recebedor);
-            $this->result->Documento = (string)trim($xml->Jadlog_Tracking_Consultar->ND->Documento);
-            $this->result->ChaveAcesso = (string)trim($xml->Jadlog_Tracking_Consultar->ND->ChaveAcesso);
-            $this->result->Cte = (string)trim($xml->Jadlog_Tracking_Consultar->ND->Cte);
-            $this->result->Serie = (string)trim($xml->Jadlog_Tracking_Consultar->ND->Serie);
-            $this->result->DataEmissao = (string)trim($xml->Jadlog_Tracking_Consultar->ND->DataEmissao);
-            $this->result->Valor = (string)trim($xml->Jadlog_Tracking_Consultar->ND->Valor);
+            $this->result->deliveryTime = (string)trim($xml->Jadlog_Tracking_Consultar->ND->DataHoraEntrega);
+            $this->result->receiver = (string)trim($xml->Jadlog_Tracking_Consultar->ND->Recebedor);
+            $this->result->document = (string)trim($xml->Jadlog_Tracking_Consultar->ND->Documento);
+            $this->result->nfeKey = (string)trim($xml->Jadlog_Tracking_Consultar->ND->ChaveAcesso);
+            $this->result->cteNumber = (string)trim($xml->Jadlog_Tracking_Consultar->ND->Cte);
+            $this->result->cteSeries = (string)trim($xml->Jadlog_Tracking_Consultar->ND->Serie);
+            $this->result->issuanceDate = (string)trim($xml->Jadlog_Tracking_Consultar->ND->DataEmissao);
+            $this->result->value = (string)trim($xml->Jadlog_Tracking_Consultar->ND->Valor);
 
-//            $this->result->histories = new \ArrayObject();
             $count = count($xml->Jadlog_Tracking_Consultar->ND->Evento);
             foreach ($xml->Jadlog_Tracking_Consultar->ND->Evento as $history) {
                 $count--;
                 $this->result->histories[$count] = new \stdClass();
-                $this->result->histories[$count]->Codigo = (string)trim($history->Codigo);
-                $this->result->histories[$count]->DataHoraEvento = (string)trim($history->DataHoraEvento);
-                $this->result->histories[$count]->Descricao = (string)trim($history->Descricao);
-                $this->result->histories[$count]->Observacao = (string)trim($history->Observacao);
+                $this->result->histories[$count]->code = (string)trim($history->Codigo);
+                $this->result->histories[$count]->historyTime = (string)trim($history->DataHoraEvento);
+                $this->result->histories[$count]->description = (string)trim($history->Descricao);
+                $this->result->histories[$count]->remarks = (string)trim($history->Observacao);
             }
-//            $this->result->histories->ksort();
             ksort($this->result->histories);
             $this->result->histories = $this->ArrayToObject($this->result->histories);
         } else {

@@ -12,7 +12,7 @@ use Trixpua\Shipping\ShippingInfo;
  * Class Tnt
  * @author Elizandro Echer <https://github.com/Trixpua>
  * @package Trixpua\Shipping
- * @version 1.0.0
+ * @version 2.0.0
  */
 class Tnt
 {
@@ -258,11 +258,13 @@ class Tnt
      */
     public function makeRequest(): void
     {
+
         $factory = new Factory();
-        $client = $factory->create(new Client(), 'http://ws.tntbrasil.com.br/servicos/CalculoFrete?wsdl');
+        $client = $factory->create(new Client(), 'http://200.248.69.12/tntws/CalculoFrete?wsdl');
+
         try {
             $this->setQuoteWeight();
-            $promise = $client->callAsync('calculaFrete', $this->buildRequest())->then(function($response) {
+            $promise = $client->callAsync('calculaFrete', $this->buildRequest())->then(function ($response) {
                 $this->parseResult($response);
             });
             $promise->wait();
@@ -296,23 +298,23 @@ class Tnt
         return [
             'calculaFrete' => [
                 'in0' => [
-                    'login' => $this->login,
-                    'senha' => $this->password,
-                    'tpPessoaRemetente' => $this->senderPersonType,
-                    'tpSituacaoTributariaRemetente' => $this->senderTaxSituation,
-                    'cdDivisaoCliente' => $this->clientDivisionCode,
-                    'nrIdentifClienteRem' => $this->senderTaxId,
-                    'nrInscricaoEstadualRemetente' => $this->senderStateRegistrationNumber,
-                    'cepOrigem' => $this->senderZipCode,
-                    'tpFrete' => $this->shippingIncoterm,
-                    'tpServico' => $this->shippingModal,
-                    'tpPessoaDestinatario' => $this->receiverPersonType,
-                    'tpSituacaoTributariaDestinatario' => $this->receiverTaxSituation,
-                    'nrIdentifClienteDest' => $this->receiverTaxId,
-                    'nrInscricaoEstadualDestinatario' => $this->receiverStateRegistrationNumber,
-                    'cepDestino' => $this->shippingInfo->getReceiverZipCode(),
-                    'psReal' => $this->weight,
-                    'vlMercadoria' => $this->shippingInfo->getCommodityValue()
+                    'login' => new \SoapVar($this->login, XSD_STRING, 'string', null, 'login', 'http://model.vendas.lms.mercurio.com'),
+                    'senha' => new \SoapVar($this->password, XSD_STRING, 'string', null, 'senha', 'http://model.vendas.lms.mercurio.com'),
+                    'tpPessoaRemetente' => new \SoapVar($this->senderPersonType, XSD_STRING, 'string', null, 'tpPessoaRemetente', 'http://model.vendas.lms.mercurio.com'),
+                    'tpSituacaoTributariaRemetente' => new \SoapVar($this->senderTaxSituation, XSD_STRING, 'string', null, 'tpSituacaoTributariaRemetente', 'http://model.vendas.lms.mercurio.com'),
+                    'cdDivisaoCliente' => new \SoapVar($this->clientDivisionCode, XSD_STRING, 'string', null, 'cdDivisaoCliente', 'http://model.vendas.lms.mercurio.com'),
+                    'nrIdentifClienteRem' => new \SoapVar($this->senderTaxId, XSD_STRING, 'string', null, 'nrIdentifClienteRem', 'http://model.vendas.lms.mercurio.com'),
+                    'nrInscricaoEstadualRemetente' => new \SoapVar($this->senderStateRegistrationNumber, XSD_STRING, 'string', null, 'nrInscricaoEstadualRemetente', 'http://model.vendas.lms.mercurio.com'),
+                    'cepOrigem' => new \SoapVar($this->senderZipCode, XSD_STRING, 'string', null, 'cepOrigem', 'http://model.vendas.lms.mercurio.com'),
+                    'tpFrete' => new \SoapVar($this->shippingIncoterm, XSD_STRING, 'string', null, 'tpFrete', 'http://model.vendas.lms.mercurio.com'),
+                    'tpServico' => new \SoapVar($this->shippingModal, XSD_STRING, 'string', null, 'tpServico', 'http://model.vendas.lms.mercurio.com'),
+                    'tpPessoaDestinatario' => new \SoapVar($this->receiverPersonType, XSD_STRING, 'string', null, 'tpPessoaDestinatario', 'http://model.vendas.lms.mercurio.com'),
+                    'tpSituacaoTributariaDestinatario' => new \SoapVar($this->receiverTaxSituation, XSD_STRING, 'string', null, 'tpSituacaoTributariaDestinatario', 'http://model.vendas.lms.mercurio.com'),
+                    'nrIdentifClienteDest' => new \SoapVar($this->receiverTaxId, XSD_STRING, 'string', null, 'nrIdentifClienteDest', 'http://model.vendas.lms.mercurio.com'),
+                    'nrInscricaoEstadualDestinatario' => new \SoapVar($this->receiverStateRegistrationNumber, XSD_STRING, 'string', null, 'nrInscricaoEstadualDestinatario', 'http://model.vendas.lms.mercurio.com'),
+                    'cepDestino' => new \SoapVar($this->shippingInfo->getReceiverZipCode(), XSD_STRING, 'string', null, 'cepDestino', 'http://model.vendas.lms.mercurio.com'),
+                    'psReal' => new \SoapVar($this->weight, XSD_STRING, 'string', null, 'psReal', 'http://model.vendas.lms.mercurio.com'),
+                    'vlMercadoria' => new \SoapVar($this->shippingInfo->getCommodityValue(), XSD_STRING, 'string', null, 'vlMercadoria', 'http://model.vendas.lms.mercurio.com')
                 ]
             ]
         ];
@@ -324,38 +326,69 @@ class Tnt
      */
     private function parseResult(\stdClass $response): void
     {
-        if (property_exists($response->out->errorList, 'string') === false) {
+        if (!property_exists($response->out, 'errorList')) {
             $this->result->status = 'OK';
             $this->result->shippingCost = number_format((($response->out->vlTotalFrete + $this->shippingInfo->getAdditionalCharge()) / (1 - ($this->shippingInfo->getAdditionalPercent() / 100))), 2, '.', '');
 
             $this->result->deliveryTime = $response->out->prazoEntrega + $this->shippingInfo->getShipmentDelay();
 
-            $this->result->nomeRemetente = $response->out->nmRemetente;
-            $this->result->nomeMunicipioOrigem = $response->out->nmMunicipioOrigem;
-            $this->result->telefoneFilialOrigem = $response->out->nrDDDFilialOrigem . ' ' .
-                $response->out->nrTelefoneFilialOrigem;
-            $this->result->nomeDestinatario = $response->out->nmDestinatario;
-            $this->result->nomeMunicipioDestino = $response->out->nmMunicipioDestino;
-            $this->result->telefoneFilialDestino = $response->out->nrDDDFilialDestino . ' ' .
-                $response->out->nrTelefoneFilialDestino;
-            $this->result->valorDesconto = $response->out->vlDesconto;
-            $this->result->valorIcmsSubstituicaoTributaria = $response->out->vlICMSubstituicaoTributaria;
-            $this->result->valorImposto = $response->out->vlImposto;
-            $this->result->valorTotalCtrc = $response->out->vlTotalCtrc;
-            $this->result->valorTotalServico = $response->out->vlTotalServico;
-            $this->result->parcelas = $response->out->parcelas;
+            $this->result->senderName = property_exists($response->out, 'nmRemetente') ? $response->out->nmRemetente : '';
+            $this->result->originCity = property_exists($response->out, 'nmMunicipioOrigem') ? $response->out->nmMunicipioOrigem : '';
+            $this->result->originBranchPhone = property_exists($response->out, 'nrDDDFilialOrigem') && property_exists($response->out, 'nrTelefoneFilialOrigem') ? $response->out->nrDDDFilialOrigem . ' ' .
+                $response->out->nrTelefoneFilialOrigem : '';
+            $this->result->receiverName = property_exists($response->out, 'nmDestinatario') ? $response->out->nmDestinatario : '';
+            $this->result->destinyCity = property_exists($response->out, 'nmMunicipioDestino') ? $response->out->nmMunicipioDestino : '';
+            $this->result->destinyBranchPhone = property_exists($response->out, 'nrDDDFilialDestino') && property_exists($response->out, 'nrTelefoneFilialDestino') ? $response->out->nrDDDFilialDestino . ' ' .
+                $response->out->nrTelefoneFilialDestino : '';
+            $this->result->discountValue = property_exists($response->out, 'vlDesconto') ? $response->out->vlDesconto : '';
+            $this->result->icmsStValue = property_exists($response->out, 'vlICMSubstituicaoTributaria') ? $response->out->vlICMSubstituicaoTributaria : '';
+            $this->result->taxesValue = property_exists($response->out, 'vlImposto') ? $response->out->vlImposto : '';
+            $this->result->ctrcTotalvalue = property_exists($response->out, 'vlTotalCtrc') ? $response->out->vlTotalCtrc : '';
+            $this->result->serviceTotalvalue = property_exists($response->out, 'vlTotalServico') ? $response->out->vlTotalServico : '';
+            $this->setParcels($response->out->parcelas);
+            $this->setAdditionalServices($response->out->servicosAdicionais);
 
         } else {
-            if (is_array($response->out->errorList->string)) {
+            if (is_array($response->out->errorList)) {
                 $this->result->status = 'ERROR';
-                foreach ($response->out->errorList->string as $error) {
+                foreach ($response->out->errorList as $error) {
                     $this->result->errors[] = $error;
                 }
             } else {
                 $this->result->status = 'ERROR';
-                $this->result->errors[] = $response->out->errorList->string;
+                $this->result->errors[] = $response->out->errorList;
             }
 
+        }
+    }
+
+    /**
+     * Set the parcels
+     * @param $parcels
+     */
+    private function setParcels(object $parcels): void
+    {
+        $this->result->parcels = new \stdClass();
+        foreach ($parcels->ParcelasFreteWebService as $key => $parcel) {
+            $this->result->parcels->{$key} = new \stdClass();
+            $this->result->parcels->{$key}->description = $parcel->dsParcela;
+            $this->result->parcels->{$key}->value = $parcel->vlParcela;
+        }
+    }
+
+    /**
+     * Set the additional services
+     * @param $additionalServices
+     */
+    private function setAdditionalServices(object $additionalServices): void
+    {
+        $this->result->additionalServices = new \stdClass();
+        foreach ($additionalServices->ServicoAdicionalWebService as $key => $additionalService) {
+            $this->result->additionalServices->{$key} = new \stdClass();
+            $this->result->additionalServices->{$key}->service = $additionalService->nmServico;
+            $this->result->additionalServices->{$key}->description = $additionalService->dsComplemento;
+            $this->result->additionalServices->{$key}->currency = $additionalService->sgMoeda;
+            $this->result->additionalServices->{$key}->value = $additionalService->vlServico;
         }
     }
 

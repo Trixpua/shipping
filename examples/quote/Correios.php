@@ -13,15 +13,15 @@ $correios->setData($shippingInfo);
 $correios->makeRequest();
 
 
-$return = $correios->getResult();
-
-
 //$correios->setShippingModal('04014');
-//$correios->makeQuoteRequest();
+//$correios->makeRequest();
 
 
 //$correios->setShippingModal('04014, 04510, 40169, 40215, 40290');
-//$correios->makeQuoteRequest();
+//$correios->makeRequest();
+
+$return = $correios->getResult();
+
 
 var_dump($return);
 
