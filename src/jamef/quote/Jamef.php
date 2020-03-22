@@ -162,7 +162,6 @@ class Jamef
         $client = new Client();
         try {
             $this->shippingInfo->isQuoteByWeight() ? $this->shippingInfo->setVolume('0') : null;
-            var_dump($this->buildRequest());
             $promise = $client->requestAsync('GET', $this->buildRequest())->then(function($response) {
                 $this->parseResult($response);
             });
