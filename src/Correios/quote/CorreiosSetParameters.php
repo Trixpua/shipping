@@ -7,10 +7,10 @@ use Trixpua\Shipping\ShippingInfo;
 
 
 /**
- * Class correios
+ * Class Correios
  * @author Elizandro Echer <https://github.com/Trixpua>
  * @package Trixpua\Shipping
- * @version 1.0.0
+ * @version 2.0.0
  */
 abstract class CorreiosSetParameters
 {
@@ -64,7 +64,7 @@ abstract class CorreiosSetParameters
     protected $result;
 
     /**
-     * correios constructor.
+     * Correios constructor.
      * @param string $senderZipCode Define the sender ZIP code
      * @param null|string $login OPTIONAL (DEFAULT null) - Define the company administrative code available in the contract, if you have
      * @param null|string $password OPTIONAL (DEFAULT null) - Define the password to access the service, associated with your administrative code

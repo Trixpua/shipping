@@ -8,10 +8,10 @@ use GuzzleHttp\Psr7\Response;
 ini_set('max_execution_time', 0);
 
 /**
- * Class tamcargo
+ * Class TamCargo
  * @author Elizandro Echer <https://github.com/Trixpua>
  * @package Trixpua\Shipping
- * @version 1.0.0
+ * @version 2.0.0
  */
 class TamCargo extends TamCargoSetParameters
 {
@@ -21,6 +21,7 @@ class TamCargo extends TamCargoSetParameters
      */
     public function makeRequest(): void
     {
+
         $this->setQuoteWeight();
         $this->login();
         if (!$this->viewStateLogin) {
@@ -33,13 +34,17 @@ class TamCargo extends TamCargoSetParameters
             $this->makeRequest();
             return;
         }
+
         $this->defineOriginAirport();
         $this->defineDestinyAirport();
+
+
 
         if ($this->result->status === 'ERROR') {
             return;
         }
         $this->definePayer();
+
         $this->getResponse();
     }
 
@@ -66,7 +71,7 @@ class TamCargo extends TamCargoSetParameters
             ];
 
             $promise = $this->client->requestAsync('POST',
-                'https://secure.lancargo.com/eBusiness-web-1.0-view/private/CreateQuotation.jsf',
+                'https://mycargomanager.appslatam.com/eBusiness-web-1.0-view/private/CreateQuotation.jsf',
                 [
                     'form_params' => $parameters,
                     'headers' => $this->mainHeader
@@ -106,7 +111,7 @@ class TamCargo extends TamCargoSetParameters
             ];
 
             $promise = $this->client->requestAsync('POST',
-                'https://secure.lancargo.com/eBusiness-web-1.0-view/private/CreateQuotation.jsf',
+                'https://mycargomanager.appslatam.com/eBusiness-web-1.0-view/private/CreateQuotation.jsf',
                 [
                     'form_params' => $parameters,
                     'headers' => $this->mainHeader
@@ -146,7 +151,7 @@ class TamCargo extends TamCargoSetParameters
             ];
 
             $promise = $this->client->requestAsync('POST',
-                'https://secure.lancargo.com/eBusiness-web-1.0-view/private/CreateQuotation.jsf',
+                'https://mycargomanager.appslatam.com/eBusiness-web-1.0-view/private/CreateQuotation.jsf',
                 [
                     'form_params' => $parameters,
                     'headers' => $this->mainHeader
@@ -188,7 +193,7 @@ class TamCargo extends TamCargoSetParameters
             ];
 
             $promise = $this->client->requestAsync('POST',
-                'https://secure.lancargo.com/eBusiness-web-1.0-view/private/CreateQuotation.jsf',
+                'https://mycargomanager.appslatam.com/eBusiness-web-1.0-view/private/CreateQuotation.jsf',
                 [
                     'form_params' => $parameters,
                     'headers' => $this->mainHeader
@@ -231,7 +236,7 @@ class TamCargo extends TamCargoSetParameters
             ];
 
             $promise = $this->client->requestAsync('POST',
-                'https://secure.lancargo.com/eBusiness-web-1.0-view/private/CreateQuotation.jsf',
+                'https://mycargomanager.appslatam.com/eBusiness-web-1.0-view/private/CreateQuotation.jsf',
                 [
                     'form_params' => $parameters,
                     'headers' => $this->mainHeader
@@ -283,7 +288,7 @@ class TamCargo extends TamCargoSetParameters
             ];
 
             $promise = $this->client->requestAsync('POST',
-                'https://secure.lancargo.com/eBusiness-web-1.0-view/private/CreateQuotation.jsf',
+                'https://mycargomanager.appslatam.com/eBusiness-web-1.0-view/private/CreateQuotation.jsf',
                 [
                     'form_params' => $parameters,
                     'headers' => $this->mainHeader
@@ -328,7 +333,7 @@ class TamCargo extends TamCargoSetParameters
             ];
 
             $promise = $this->client->requestAsync('POST',
-                'https://secure.lancargo.com/eBusiness-web-1.0-view/private/CreateQuotation.jsf',
+                'https://mycargomanager.appslatam.com/eBusiness-web-1.0-view/private/CreateQuotation.jsf',
                 [
                     'form_params' => $parameters,
                     'headers' => $this->mainHeader
@@ -373,7 +378,7 @@ class TamCargo extends TamCargoSetParameters
             ];
 
             $promise = $this->client->requestAsync('POST',
-                'https://secure.lancargo.com/eBusiness-web-1.0-view/private/CreateQuotation.jsf',
+                'https://mycargomanager.appslatam.com/eBusiness-web-1.0-view/private/CreateQuotation.jsf',
                 [
                     'form_params' => $parameters,
                     'headers' => $this->mainHeader
@@ -421,7 +426,7 @@ class TamCargo extends TamCargoSetParameters
             ];
 
             $promise = $this->client->requestAsync('POST',
-                'https://secure.lancargo.com/eBusiness-web-1.0-view/private/CreateQuotation.jsf',
+                'https://mycargomanager.appslatam.com/eBusiness-web-1.0-view/private/CreateQuotation.jsf',
                 [
                     'form_params' => $parameters,
                     'headers' => $this->mainHeader
@@ -465,7 +470,7 @@ class TamCargo extends TamCargoSetParameters
             ];
 
             $promise = $this->client->requestAsync('POST',
-                'https://secure.lancargo.com/eBusiness-web-1.0-view/private/CreateQuotation.jsf',
+                'https://mycargomanager.appslatam.com/eBusiness-web-1.0-view/private/CreateQuotation.jsf',
                 [
                     'form_params' => $parameters,
                     'headers' => $this->mainHeader
@@ -497,13 +502,13 @@ class TamCargo extends TamCargoSetParameters
                 "Connection: keep-alive",
                 "Cache-Control: no-cache",
                 "Pragma: no-cache",
-                "Host: secure.lancargo.com",
-                "Referer: https://secure.lancargo.com/eBusiness-web-1.0-view/private/CreateQuotation.jsf",
+                "Host: mycargomanager.appslatam.com",
+                "Referer: https://mycargomanager.appslatam.com/eBusiness-web-1.0-view/private/CreateQuotation.jsf",
                 "Upgrade-Insecure-Requests: 1",
             ];
 
             $promise = $this->client->requestAsync('POST',
-                'https://secure.lancargo.com/eBusiness-web-1.0-view/private/DisplayQuotation.jsf',
+                'https://mycargomanager.appslatam.com/eBusiness-web-1.0-view/private/DisplayQuotation.jsf',
                 [
                     'headers' => $headers
                 ])->then(function($response) {
@@ -549,12 +554,12 @@ class TamCargo extends TamCargoSetParameters
             $this->result->modals->{$modkey}->destinyAirport = $this->destinyAirport;
             $this->result->modals->{$modkey}->redispatch = $redispatchTime ? true : false;
             $this->result->modals->{$modkey}->parcels = new \stdClass();
-            $this->result->modals->{$modkey}->parcels->frete = $tr->childNodes->item(1)->nodeValue;
-            $this->result->modals->{$modkey}->parcels->tarifa = $tr->childNodes->item(2)->nodeValue;
-            $this->result->modals->{$modkey}->parcels->coleta = $tr->childNodes->item(3)->nodeValue;
-            $this->result->modals->{$modkey}->parcels->entrega = $tr->childNodes->item(4)->nodeValue;
-            $this->result->modals->{$modkey}->parcels->outros = $tr->childNodes->item(5)->nodeValue;
-            $this->result->modals->{$modkey}->parcels->impostos = $tr->childNodes->item(6)->nodeValue;
+            $this->result->modals->{$modkey}->parcels->shipping = $tr->childNodes->item(1)->nodeValue;
+            $this->result->modals->{$modkey}->parcels->rate = $tr->childNodes->item(2)->nodeValue;
+            $this->result->modals->{$modkey}->parcels->collect = $tr->childNodes->item(3)->nodeValue;
+            $this->result->modals->{$modkey}->parcels->delivery = $tr->childNodes->item(4)->nodeValue;
+            $this->result->modals->{$modkey}->parcels->others = $tr->childNodes->item(5)->nodeValue;
+            $this->result->modals->{$modkey}->parcels->taxes = $tr->childNodes->item(6)->nodeValue;
         }
         $this->setModalStatus($this->result->modals);
 
@@ -577,7 +582,7 @@ class TamCargo extends TamCargoSetParameters
     private function setModalStatus(\stdClass $modals): void
     {
         foreach ($modals as $key => $modal) {
-            if (floatval($modal->parcels->frete)) {
+            if (floatval($modal->parcels->shipping)) {
                 $this->result->modals->{$key}->status = 'OK';
             } else {
                 $this->result->modals->{$key}->status = 'ERROR';

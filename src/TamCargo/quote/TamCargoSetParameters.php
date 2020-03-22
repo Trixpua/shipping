@@ -3,18 +3,17 @@
 namespace Trixpua\Shipping\TamCargo\Quote;
 
 use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Psr7\Response;
 use Trixpua\Shipping\ShippingInfo;
 
 ini_set('max_execution_time', 0);
 
 /**
- * Class tamcargo
+ * Class TamCargo
  * @author Elizandro Echer <https://github.com/Trixpua>
  * @package Trixpua\Shipping
- * @version 1.0.0
+ * @version 2.0.0
  */
-class TamCargoSetParameters extends TamCargoLogin
+class TamCargoSetParameters extends TamCargoAuth
 {
 
     /** @var array */
@@ -48,10 +47,10 @@ class TamCargoSetParameters extends TamCargoLogin
     protected $shippingInfo;
 
     /**
-     * tamcargo constructor.
+     * TamCargo constructor.
      * @param string $senderZipCode Define the sender ZIP code
-     * @param string $login Define the login registered to access tamcargo services
-     * @param string $password Define the password registered to access tamcargo services
+     * @param string $login Define the login registered to access TamCargo services
+     * @param string $password Define the password registered to access TamCargo services
      */
     public function __construct(string $senderZipCode, string $login, string $password)
     {
@@ -66,9 +65,9 @@ class TamCargoSetParameters extends TamCargoLogin
             "Connection: keep-alive",
             "Cache-Control: max-age=0",
             "Content-Type: application/x-www-form-urlencoded; charset=UTF-8",
-            "Host: secure.lancargo.com",
-            "Origin: https://secure.lancargo.com",
-            "Referer: https://secure.lancargo.com/eBusiness-web-1.0-view/private/CreateQuotation.jsf",
+            "Host: mycargomanager.appslatam.com",
+            "Origin: https://mycargomanager.appslatam.com",
+            "Referer: https://mycargomanager.appslatam.com/eBusiness-web-1.0-view/private/CreateQuotation.jsf",
             "Faces-Request: partial/ajax",
             "X-Requested-With: XMLHttpRequest",
             "Upgrade-Insecure-Requests: 1",
@@ -133,10 +132,10 @@ class TamCargoSetParameters extends TamCargoLogin
     {
         try {
             $promise = $this->client->requestAsync('GET',
-                'https://secure.lancargo.com/eBusiness-web-1.0-view/private/CreateQuotation.jsf',
+                'https://mycargomanager.appslatam.com/eBusiness-web-1.0-view/private/CreateQuotation.jsf',
                 [
                     'headers' => $this->mainHeader
-                ])->then(function($response) {
+                ])->then(function ($response) {
                 if (!$this->payer && strstr($response->getBody(), 'Erro ao carregar o formulário')) {
                     $this->result->status = 'ERROR';
                     $this->result->errors[] = 'Erro ao obter dados';
@@ -149,9 +148,10 @@ class TamCargoSetParameters extends TamCargoLogin
                 $xpath = new \DOMXpath($doc);
                 if ($xpath->query('//*[@id="form:j_idt123_input"]/option[2]')->item(0)) {
                     $this->payer = $xpath->query('//*[@id="form:j_idt123_input"]/option[2]')
-                                            ->item(0)
-                                            ->getAttribute('value');
+                                         ->item(0)
+                                         ->getAttribute('value');
                 }
+
                 $this->setOriginAirport();
             });
             $promise->wait();
@@ -194,11 +194,11 @@ class TamCargoSetParameters extends TamCargoLogin
                 ];
 
                 $promise = $this->client->requestAsync('POST',
-                    'https://secure.lancargo.com/eBusiness-web-1.0-view/private/CreateQuotation.jsf',
+                    'https://mycargomanager.appslatam.com/eBusiness-web-1.0-view/private/CreateQuotation.jsf',
                     [
                         'form_params' => $parameters,
                         'headers' => $this->mainHeader
-                    ])->then(function($response) {
+                    ])->then(function ($response) {
                     $this->originAirport = $this->stringBetween($response->getBody(), 'data-item-value="', '"');
                 });
                 $promise->wait();
@@ -249,11 +249,11 @@ class TamCargoSetParameters extends TamCargoLogin
 
                 $promise = $this->client->requestAsync(
                     'POST',
-                    'https://secure.lancargo.com/eBusiness-web-1.0-view/private/CreateQuotation.jsf',
+                    'https://mycargomanager.appslatam.com/eBusiness-web-1.0-view/private/CreateQuotation.jsf',
                     [
                         'form_params' => $parameters,
                         'headers' => $this->mainHeader
-                    ])->then(function($response) {
+                    ])->then(function ($response) {
                     $this->destinyAirport = $this->stringBetween($response->getBody(), 'data-item-value="', '"');
                 });
                 $promise->wait();
