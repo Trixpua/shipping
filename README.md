@@ -14,10 +14,10 @@ Shipping é um conjunto de classes otimizadas para obter cotações de envio e i
 
 ### Shipping Companies (Empresas de transporte)
 
-- TNT Mercúrio (Quote and Tracking)
-- Jamef Encomendas Urgentes (Quote and Tracking)
+- TNT Mercúrio (Quote)
+- Jamef Encomendas Urgentes (Quote)
 - JadLog (Quote and Tracking)
-- Correios (Quote and Tracking)
+- Correios (Quote)
 - Tam Cargo (Quote) - Tam Cargo don't provide a official webservice to quote, so this class is unstable and not recommended to implementation (Tam Cargo não fornece um webservice oficial para cotação, portanto essa classe é instável e não é recomendada para implementação)
 
 ## Installation
@@ -25,7 +25,7 @@ Shipping é um conjunto de classes otimizadas para obter cotações de envio e i
 Shipping is available via Composer:
 
 ```bash
-"Trixpua/shipping": "^1.0"
+"Trixpua/shipping": "^2.0"
 ```
 
 or run
@@ -138,35 +138,13 @@ $return = $tam->getResult();
 #### Track with TNT
 
 ```php
-<?php
-require __DIR__ . "/vendor/autoload.php";
-
-use Trixpua\Shipping\Tnt\Tracking\Tnt;
-
-$tnt = new Tnt('yourlogin@email.com', 'YOUR-TAX-ID');
-
-$tnt->setData('INVOICE-NUMBER');
-
-$tnt->makeRequest();
-
-$return = $tnt->getResult();
+TODO
 ```
 
 #### Track with Jamef
 
 ```php
-<?php
-require __DIR__ . "/vendor/autoload.php";
-
-use Trixpua\Shipping\Jamef\Tracking\Jamef;
-
-$jamef = new Jamef('YOUR-TAX-ID');
-
-$jamef->setData('RECEIVER-TAX-ID', 'INVOICE-NUMBER');
-
-$jamef->makeRequest();
-
-$return = $jamef->getResult();
+TODO
 ```
 
 #### Track with Jadlog
@@ -189,18 +167,7 @@ $return = $jadlog->getResult();
 #### Track with Correios
 
 ```php
-<?php
-require __DIR__ . "/vendor/autoload.php";
-
-use Trixpua\Shipping\Correios\Tracking\Correios;
-
-$correios = new Correios();
-
-$correios->setData(['PM000000000BR']);
-
-$correios->makeRequest();
-
-$return = $correios->getResult();
+TODO
 ```
 
 ## Contributing

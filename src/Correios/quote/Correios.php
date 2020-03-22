@@ -7,10 +7,10 @@ use GuzzleHttp\Client;
 use Meng\AsyncSoap\Guzzle\Factory;
 
 /**
- * Class correios
+ * Class Correios
  * @author Elizandro Echer <https://github.com/Trixpua>
  * @package Trixpua\Shipping
- * @version 1.0.0
+ * @version 2.0.0
  */
 class Correios extends CorreiosSetParameters
 {
@@ -19,11 +19,12 @@ class Correios extends CorreiosSetParameters
      */
     public function makeRequest(): void
     {
+
         $factory = new Factory();
-        $client = $factory->create(new Client(), 'http://ws.correios.com.br/calculador/CalcPrecoPrazo.asmx?WSDL');
+        $client = $factory->create(new Client(), 'http://201.48.198.97/calculador/CalcPrecoPrazo.asmx?WSDL');
         try {
             $this->setQuoteWeight();
-            $promise = $client->callAsync('CalcPrecoPrazoData', $this->buildRequest())->then(function($response) {
+            $promise = $client->callAsync('CalcPrecoPrazoData', $this->buildRequest())->then(function ($response) {
                 $this->parseResult($response);
             });
             $promise->wait();
@@ -47,10 +48,11 @@ class Correios extends CorreiosSetParameters
      */
     private function buildRequest(): array
     {
+
         return [
             'CalcPrecoPrazoData' => [
-                'nCdEmpresa' => $this->login,
-                'sDsSenha' => $this->password,
+                'nCdEmpresa' => $this->login ? $this->login : '08082650',
+                'sDsSenha' => $this->password ? $this->password : '564321',
                 'nCdServico' => $this->shippingModal,
                 'sCepOrigem' => $this->senderZipCode,
                 'sCepDestino' => $this->shippingInfo->getReceiverZipCode(),
@@ -63,7 +65,7 @@ class Correios extends CorreiosSetParameters
                 'sCdMaoPropria' => $this->receiptOwnHand,
                 'nVlValorDeclarado' => $this->setQuoteValueDeclare(),
                 'sCdAvisoRecebimento' => $this->receiptNotice,
-                'sDtCalculo' => $this->shippingDate
+                'sDtCalculo' => $this->shippingDate,
             ]
         ];
     }

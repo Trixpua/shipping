@@ -1,18 +1,12 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Elizandro
- * Date: 21/10/2018
- * Time: 22:32
- */
 
 namespace Trixpua\Shipping;
 
 /**
- * Class tamcargo
+ * Class TamCargo
  * @author Elizandro Echer <https://github.com/Trixpua>
  * @package Trixpua\Shipping
- * @version 1.0.0
+ * @version 2.0.0
  */
 class ShippingInfo
 {

@@ -11,7 +11,7 @@ use Trixpua\Shipping\ShippingInfo;
  * Class Jadlog
  * @author Elizandro Echer <https://github.com/Trixpua>
  * @package Trixpua\Shipping
- * @version 1.0.0
+ * @version 2.0.0
  */
 class Jadlog
 {
@@ -164,7 +164,7 @@ class Jadlog
     {
         $factory = new Factory();
         $client = $factory->create(new Client(),
-            'http://www.jadlog.com.br:8080/JadlogEdiWs/services/ValorFreteBean?wsdl');
+            'http://201.63.135.178:8080/JadlogEdiWs/services/ValorFreteBean?wsdl');
         try {
             $this->setQuoteWeight();
             $promise = $client->callAsync('valorar', $this->buildRequest())->then(function($response) {

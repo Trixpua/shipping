@@ -11,7 +11,7 @@ use Trixpua\Shipping\ShippingInfo;
  * Class Jamef
  * @author Elizandro Echer <https://github.com/Trixpua>
  * @package Trixpua\Shipping\Quote
- * @version 1.0.0
+ * @version 2.0.0
  */
 class Jamef
 {
@@ -162,6 +162,7 @@ class Jamef
         $client = new Client();
         try {
             $this->shippingInfo->isQuoteByWeight() ? $this->shippingInfo->setVolume('0') : null;
+            var_dump($this->buildRequest());
             $promise = $client->requestAsync('GET', $this->buildRequest())->then(function($response) {
                 $this->parseResult($response);
             });
@@ -193,6 +194,7 @@ class Jamef
     /**
      * Parse the response from the webservice and set the result
      * @param Response $response
+     * @throws \Exception
      */
     private function parseResult(Response $response): void
     {
@@ -227,6 +229,7 @@ class Jamef
     /**
      * Set the delivery time
      * @param string $deliveryForecast
+     * @throws \Exception
      */
     private function setDeliveryTime(string $deliveryForecast): void
     {
@@ -253,9 +256,10 @@ class Jamef
      */
     private function strRemoveSpecialChars(string $string): string
     {
-        return $this->strNormalize(preg_replace('/[^\w\s]/', '', iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', preg_replace('/[^\pL\pN]/u', ' ', $this->strNormalize($string)))));
-    }
+        return html_entity_decode(preg_replace('/&([a-zA-Z])(uml|acute|grave|circ|tilde|cedil|lig);/','$1',htmlentities($this->strNormalize($string), ENT_COMPAT, "UTF-8")));
+//        return $this->strNormalize(preg_replace('/[^\w\s]/', '', iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', preg_replace('/[^\pL\pN]/u', ' ', $this->strNormalize($string))))); //don't work properly with iconv glibc only with libiconv
 
+    }
     /**
      * Convert the charset to UTF-8 and decode the HTML entities, and so remove the unnecessary spaces
      * @param string $string
