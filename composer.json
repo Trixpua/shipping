@@ -21,8 +21,13 @@
   ],
   "require": {
     "php": "^7.2",
-    "guzzlehttp/guzzle": "^6.3",
-    "meng-tian/async-soap-guzzle": "^0.2"
+    "guzzlehttp/guzzle": "^6.5",
+    "meng-tian/async-soap-guzzle": "^0.2",
+    "ext-json": "*",
+    "ext-dom": "*",
+    "ext-libxml": "*",
+    "ext-soap": "*",
+    "ext-simplexml": "*"
   },
   "autoload": {
     "psr-4": {
