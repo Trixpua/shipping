@@ -6,7 +6,7 @@ namespace Trixpua\Shipping;
  * Class TamCargo
  * @author Elizandro Echer <https://github.com/Trixpua>
  * @package Trixpua\Shipping
- * @version 2.0.0
+ * @version 2.0.2
  */
 class ShippingInfo
 {
