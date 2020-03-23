@@ -10,7 +10,7 @@ use Trixpua\Shipping\ShippingInfo;
  * Class Correios
  * @author Elizandro Echer <https://github.com/Trixpua>
  * @package Trixpua\Shipping
- * @version 2.0.0
+ * @version 2.0.2
  */
 abstract class CorreiosSetParameters
 {
