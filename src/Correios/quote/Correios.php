@@ -4,13 +4,14 @@ namespace Trixpua\Shipping\Correios\Quote;
 
 
 use GuzzleHttp\Client;
-use Meng\AsyncSoap\Guzzle\Factory;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Psr7\Response;
 
 /**
  * Class Correios
  * @author Elizandro Echer <https://github.com/Trixpua>
  * @package Trixpua\Shipping
- * @version 2.0.0
+ * @version 2.0.2
  */
 class Correios extends CorreiosSetParameters
 {
@@ -20,17 +21,16 @@ class Correios extends CorreiosSetParameters
     public function makeRequest(): void
     {
 
-        $factory = new Factory();
-        $client = $factory->create(new Client(), 'http://201.48.198.97/calculador/CalcPrecoPrazo.asmx?WSDL');
+        $client = new Client();
         try {
             $this->setQuoteWeight();
-            $promise = $client->callAsync('CalcPrecoPrazoData', $this->buildRequest())->then(function ($response) {
-                $this->parseResult($response);
-            });
+            $promise = $client->requestAsync('GET', 'http://201.48.198.97/calculador/CalcPrecoPrazo.aspx?' . http_build_query($this->buildRequest()))->then(function ($response) {
+                                  $this->parseResult($response);
+                              });
             $promise->wait();
-        } catch (\Exception $e) {
+        } catch (RequestException $e) {
             $this->result->status = 'ERROR';
-            $this->result->errors[] = 'Soap Error: ' . $e->getMessage();
+            $this->result->errors[] = 'Curl Error: ' . $e->getMessage();
         }
     }
 
@@ -48,25 +48,24 @@ class Correios extends CorreiosSetParameters
      */
     private function buildRequest(): array
     {
-
         return [
-            'CalcPrecoPrazoData' => [
-                'nCdEmpresa' => $this->login ? $this->login : '08082650',
-                'sDsSenha' => $this->password ? $this->password : '564321',
-                'nCdServico' => $this->shippingModal,
-                'sCepOrigem' => $this->senderZipCode,
-                'sCepDestino' => $this->shippingInfo->getReceiverZipCode(),
-                'nVlPeso' => $this->weight,
-                'nCdFormato' => $this->packageFormat,
-                'nVlComprimento' => $this->setQuoteLength(),
-                'nVlAltura' => $this->setQuoteHeight(),
-                'nVlLargura' => $this->setQuoteWidth(),
-                'nVlDiametro' => $this->setQuoteDiameter(),
-                'sCdMaoPropria' => $this->receiptOwnHand,
-                'nVlValorDeclarado' => $this->setQuoteValueDeclare(),
-                'sCdAvisoRecebimento' => $this->receiptNotice,
-                'sDtCalculo' => $this->shippingDate,
-            ]
+            'nCdEmpresa' => $this->login ? $this->login : '08082650',
+            'sDsSenha' => $this->password ? $this->password : '564321',
+            'nCdServico' => $this->shippingModal,
+            'sCepOrigem' => $this->senderZipCode,
+            'sCepDestino' => $this->shippingInfo->getReceiverZipCode(),
+            'nVlPeso' => $this->weight,
+            'nCdFormato' => $this->packageFormat,
+            'nVlComprimento' => $this->setQuoteLength(),
+            'nVlAltura' => $this->setQuoteHeight(),
+            'nVlLargura' => $this->setQuoteWidth(),
+            'nVlDiametro' => $this->setQuoteDiameter(),
+            'sCdMaoPropria' => $this->receiptOwnHand,
+            'nVlValorDeclarado' => $this->setQuoteValueDeclare(),
+            'sCdAvisoRecebimento' => $this->receiptNotice,
+            'sDtCalculo' => $this->shippingDate,
+            'StrRetorno' => 'xml',
+            'op' => 'CalcPrecoPrazoRestricao'
         ];
     }
 
@@ -152,52 +151,36 @@ class Correios extends CorreiosSetParameters
 
     /**
      * Parse the response from the webservice and set the result
-     * @param \stdClass $response
+     * @param Response $response
      */
-    private function parseResult(\stdClass $response): void
+    private function parseResult(Response $response): void
     {
+        $result = simplexml_load_string($response->getBody()->getContents());
+
         $this->resultReset();
         $this->result->status = 'OK';
         $this->result->modals = new \stdClass();
-        if (is_array($response->CalcPrecoPrazoDataResult->Servicos->cServico)) {
-            foreach ($response->CalcPrecoPrazoDataResult->Servicos->cServico as $key => $row) {
-                $this->result->modals->{$key} = new \stdClass();
-                $this->setModalStatus($key, $row->Valor, $row->MsgErro);
 
-                $this->result->modals->{$key}->shippingCost = number_format(((number_format(str_replace(',', '.', str_replace('.', '', $row->Valor)), 2, '.', '') + $this->shippingInfo->getAdditionalCharge()) / (1 - ($this->shippingInfo->getAdditionalPercent() / 100))), 2, '.', '');
-                $this->result->modals->{$key}->deliveryTime = $row->PrazoEntrega + $this->shippingInfo->getShipmentDelay();
-                $this->result->modals->{$key}->shipCode = str_pad($row->Codigo, '5', '0', STR_PAD_LEFT);
-                $this->result->modals->{$key}->ownHandValue = number_format(str_replace(',', '.', str_replace('.', '', $row->ValorMaoPropria)), 2, '.', '');
-                $this->result->modals->{$key}->receiptNoticeValue = number_format(str_replace(',', '.', str_replace('.', '', $row->ValorAvisoRecebimento)), 2, '.', '');
-                $this->result->modals->{$key}->declaredValue = number_format(str_replace(',', '.', str_replace('.', '', $row->ValorValorDeclarado)), 2, '.', '');
-                $this->result->modals->{$key}->homeDelivery = $row->EntregaDomiciliar;
-                $this->result->modals->{$key}->saturdayDelivery = $row->EntregaSabado;
-                $this->result->modals->{$key}->valueWithoutAdditional = number_format(str_replace(',', '.', str_replace('.', '', $row->ValorSemAdicionais)), 2, '.', '');
-                $this->result->modals->{$key}->remarks = $row->obsFim;
-                $this->result->modals->{$key}->errorCode = $row->Erro;
-                $this->result->modals->{$key}->errorMessage = $row->MsgErro;
-            }
-        } else {
-            $this->resultReset();
-            $this->result->status = 'OK';
-            $this->result->modals = new \stdClass();
-            $this->result->modals->{0} = new \stdClass();
-            $this->setModalStatus(0, $response->CalcPrecoPrazoDataResult->Servicos->cServico->Valor, $response->CalcPrecoPrazoDataResult->Servicos->cServico->MsgErro);
+        $key = 0;
+        foreach ($result as $row) {
+            $this->result->modals->{$key} = new \stdClass();
+            $this->setModalStatus($key, $row->Valor, $row->MsgErro);
 
-            $this->result->modals->{0}->shippingCost = number_format(((number_format(str_replace(',', '.', str_replace('.', '', $response->CalcPrecoPrazoDataResult->Servicos->cServico->Valor)), 2, '.', '') + $this->shippingInfo->getAdditionalCharge()) / (1 - ($this->shippingInfo->getAdditionalPercent() / 100))), 2, '.', '');
-            $this->result->modals->{0}->deliveryTime = $response->CalcPrecoPrazoDataResult->Servicos->cServico->PrazoEntrega + $this->shippingInfo->getShipmentDelay();
-            $this->result->modals->{0}->shipCode = str_pad($response->CalcPrecoPrazoDataResult->Servicos->cServico->Codigo, '5', '0', STR_PAD_LEFT);
-            $this->result->modals->{0}->ownHandValue = number_format(str_replace(',', '.', str_replace('.', '', $response->CalcPrecoPrazoDataResult->Servicos->cServico->ValorMaoPropria)), 2, '.', '');
-            $this->result->modals->{0}->receiptNoticeValue = number_format(str_replace(',', '.', str_replace('.', '', $response->CalcPrecoPrazoDataResult->Servicos->cServico->ValorAvisoRecebimento)), 2, '.', '');
-            $this->result->modals->{0}->declaredValue = number_format(str_replace(',', '.', str_replace('.', '', $response->CalcPrecoPrazoDataResult->Servicos->cServico->ValorValorDeclarado)), 2, '.', '');
-            $this->result->modals->{0}->homeDelivery = $response->CalcPrecoPrazoDataResult->Servicos->cServico->EntregaDomiciliar;
-            $this->result->modals->{0}->saturdayDelivery = $response->CalcPrecoPrazoDataResult->Servicos->cServico->EntregaSabado;
-            $this->result->modals->{0}->valueWithoutAdditional = number_format(str_replace(',', '.', str_replace('.', '', $response->CalcPrecoPrazoDataResult->Servicos->cServico->ValorSemAdicionais)), 2, '.', '');
-            $this->result->modals->{0}->remarks = $response->CalcPrecoPrazoDataResult->Servicos->cServico->obsFim;
-            $this->result->modals->{0}->errorCode = $response->CalcPrecoPrazoDataResult->Servicos->cServico->Erro;
-            $this->result->modals->{0}->errorMessage = $response->CalcPrecoPrazoDataResult->Servicos->cServico->MsgErro;
+            $this->result->modals->{$key}->shippingCost = number_format(((number_format(str_replace(',', '.', str_replace('.', '', $row->Valor)), 2, '.', '') + $this->shippingInfo->getAdditionalCharge()) / (1 - ($this->shippingInfo->getAdditionalPercent() / 100))), 2, '.', '');
+            $this->result->modals->{$key}->deliveryTime = $row->PrazoEntrega + $this->shippingInfo->getShipmentDelay();
+            $this->result->modals->{$key}->shipCode = str_pad($row->Codigo, '5', '0', STR_PAD_LEFT);
+            $this->result->modals->{$key}->ownHandValue = number_format(str_replace(',', '.', str_replace('.', '', $row->ValorMaoPropria)), 2, '.', '');
+            $this->result->modals->{$key}->receiptNoticeValue = number_format(str_replace(',', '.', str_replace('.', '', $row->ValorAvisoRecebimento)), 2, '.', '');
+            $this->result->modals->{$key}->declaredValue = number_format(str_replace(',', '.', str_replace('.', '', $row->ValorValorDeclarado)), 2, '.', '');
+            $this->result->modals->{$key}->homeDelivery = $row->EntregaDomiciliar;
+            $this->result->modals->{$key}->saturdayDelivery = $row->EntregaSabado;
+            $this->result->modals->{$key}->valueWithoutAdditional = number_format(str_replace(',', '.', str_replace('.', '', $row->ValorSemAdicionais)), 2, '.', '');
+            $this->result->modals->{$key}->remarks = $row->obsFim;
+            $this->result->modals->{$key}->errorCode = $row->Erro;
+            $this->result->modals->{$key}->errorMessage = $row->MsgErro;
+
+            $key++;
         }
-
     }
 
     /**
