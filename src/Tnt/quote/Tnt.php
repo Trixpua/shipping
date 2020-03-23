@@ -385,10 +385,10 @@ class Tnt
         $this->result->additionalServices = new \stdClass();
         foreach ($additionalServices->ServicoAdicionalWebService as $key => $additionalService) {
             $this->result->additionalServices->{$key} = new \stdClass();
-            $this->result->additionalServices->{$key}->service = $additionalService->nmServico;
-            $this->result->additionalServices->{$key}->description = $additionalService->dsComplemento;
-            $this->result->additionalServices->{$key}->currency = $additionalService->sgMoeda;
-            $this->result->additionalServices->{$key}->value = $additionalService->vlServico;
+            $this->result->additionalServices->{$key}->service = property_exists($additionalService, 'nmServico') ? $additionalService->nmServico : '';
+            $this->result->additionalServices->{$key}->description = property_exists($additionalService, 'dsComplemento') ? $additionalService->dsComplemento : '';
+            $this->result->additionalServices->{$key}->currency = property_exists($additionalService, 'sgMoeda') ? $additionalService->sgMoeda : '';
+            $this->result->additionalServices->{$key}->value = property_exists($additionalService, 'vlServico') ? $additionalService->vlServico : '';
         }
     }
 
