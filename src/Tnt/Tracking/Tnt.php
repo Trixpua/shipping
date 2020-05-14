@@ -109,8 +109,6 @@ class Tnt
         $client = $factory->create(new Client(), 'https://ws.tntbrasil.com.br/tntws/Localizacao?wsdl');
         try {
             $promise = $client->callAsync('localizaMercadoria', $this->buildRequest())->then(function ($response) {
-                var_dump($this, $response);
-
                 $this->parseResult($response);
             });
             $promise->wait();
