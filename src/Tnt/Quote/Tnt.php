@@ -260,7 +260,7 @@ class Tnt
     {
 
         $factory = new Factory();
-        $client = $factory->create(new Client(), 'http://200.248.69.12/tntws/CalculoFrete?wsdl');
+        $client = $factory->create(new Client(), 'https://ws.tntbrasil.com.br/tntws/CalculoFrete?wsdl');
 
         try {
             $this->setQuoteWeight();
