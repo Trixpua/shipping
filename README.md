@@ -138,7 +138,18 @@ $return = $tam->getResult();
 #### Track with TNT
 
 ```php
-TODO
+<?php
+require __DIR__ . "/vendor/autoload.php";
+
+use Trixpua\Shipping\Tnt\Tracking\Tnt;
+
+$tnt = new Tnt('yourlogin@email.com', 'YOUR-TAX-ID');
+
+$tnt->setData('INVOICE-NUMBER');
+
+$tnt->makeRequest();
+
+$return = $tnt->getResult();
 ```
 
 #### Track with Jamef
