@@ -4,7 +4,7 @@ require __DIR__ . '/../../vendor/autoload.php';
 
 use Trixpua\Shipping\Correios\Tracking\Correios;
 
-$correios = new Correios
+$correios = new Correios();
 
 //$correios->setData('LB370015668SE');
 //$correios->setData('PM839201376BR');
