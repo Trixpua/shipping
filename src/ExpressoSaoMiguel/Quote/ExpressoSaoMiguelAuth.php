@@ -1,6 +1,6 @@
 <?php
 
-namespace Trixpua\Shipping\TamCargo\Quote;
+namespace Trixpua\Shipping\ExpressoSaoMiguel\Quote;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
@@ -8,19 +8,16 @@ use GuzzleHttp\Exception\RequestException;
 ini_set('max_execution_time', 0);
 
 /**
- * Class TamCargo
+ * Class ExpressoSaoMiguelAuth
  * @author Elizandro Echer <https://github.com/Trixpua>
  * @package Trixpua\Shipping
  * @version 2.0.6
  */
-abstract class TamCargoAuth
+abstract class ExpressoSaoMiguelAuth
 {
 
     /** @var Client */
     protected $client;
-
-    /** @var string */
-    protected $urlLogin;
 
     /** @var string */
     protected $viewStateLogin;
@@ -35,7 +32,7 @@ abstract class TamCargoAuth
     protected $result;
 
     /**
-     * TamCargo constructor.
+     * ExpressoSaoMiguelAuth constructor.
      * @param string $login Define the login registered to access TamCargo services
      * @param string $password Define the password registered to access TamCargo services
      */
@@ -63,69 +60,46 @@ abstract class TamCargoAuth
     }
 
     /**
-     * Make the login in My Cargo Manager service and set the required parameters needed to proceed
+     * Make the login in Expresso Sao Miguel service and set the required parameters needed to proceed
      */
     protected function login(): void
     {
         $this->client = new Client(['cookies' => true]);
         try {
-            $promise = $this->client->requestAsync('GET',
-                'https://mycargomanager.appslatam.com/cas/login?TARGET=https://mycargomanager.appslatam.com/eBusiness-web-1.0-view/private/CreateQuotation.jsf?parameters=LA-pt')
-                                    ->then(function($response) {
-                                        $doc = new \DOMDocument();
-                                        $libxml_previous_state = libxml_use_internal_errors(true);
-                                        $doc->loadHTML($response->getBody());
-                                        libxml_use_internal_errors($libxml_previous_state);
-                                        $xpath = new \DOMXpath($doc);
-                                        $lt = $xpath->query('//input[@name="lt"]')
-                                                    ->item(0)
-                                                    ->getAttribute('value');
-                                        $execution = $xpath->query('//input[@name="execution"]')
-                                                            ->item(0)
-                                                            ->getAttribute('value');
-                                        $this->setViewState($lt, $execution);
-                                    });
-            $promise->wait();
-        } catch (RequestException $e) {
-            $this->result->status = 'ERROR';
-            $this->result->errors[] = 'Curl Error: ' . $e->getMessage();
-        }
-    }
+            $this->getViewState();
 
-    /**
-     * Set view state to use and next request
-     * @param string $lt
-     * @param string $execution
-     */
-    private function setViewState(string $lt, string $execution)
-    {
-        try {
-            $this->urlLogin = "https://mycargomanager.appslatam.com/cas/login;jsessionid={$this->client->getConfig('cookies')->toArray()[0]['Value']}?TARGET=https://mycargomanager.appslatam.com/eBusiness-web-1.0-view/private/CreateQuotation.jsf?parameters=LA-pt";
             $headers = [
-                "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36",
-                "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
-                "Accept-Language: pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
+                "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36",
+                "Accept: application/xml, text/xml, */*; q=0.01",
+                "Accept-Language: pt-BR,pt;q=0.9",
                 "Accept-Encoding: ",
                 "Connection: keep-alive",
-                "Cache-Control: max-age=0",
-                "Content-Type: application/x-www-form-urlencoded",
-                "Host: mycargomanager.appslatam.com",
-                "Origin: https://mycargomanager.appslatam.com",
-                "Referer: https://mycargomanager.appslatam.com/cas/login",
-                "Upgrade-Insecure-Requests: 1",
+                "Cache-Control: no-cache",
+                "Content-Type: application/x-www-form-urlencoded; charset=UTF-8",
+                "Host: intranet2.expressosaomiguel.com.br",
+                "Origin: https://intranet2.expressosaomiguel.com.br",
+                "Referer: https://intranet2.expressosaomiguel.com.br/",
+                "Faces-Request: partial/ajax",
+                "Sec-Fetch-Dest: empty",
+                "Sec-Fetch-Mode: cors",
+                "Sec-Fetch-Site: same-origin",
+                "X-Requested-With: XMLHttpRequest"
             ];
 
             $parameters = [
-                'username' => $this->login,
-                'password' => $this->password,
-                'lt' => $lt,
-                'execution' => $execution,
-                '_eventId' => 'submit',
-                'submit' => 'ENTRAR',
+                'javax.faces.partial.ajax' => 'true',
+                'javax.faces.source' => 'formLogin:j_idt25',
+                'javax.faces.partial.execute' => '@all',
+                'javax.faces.partial.render' => 'growlLogin',
+                'formLogin:j_idt25' => 'formLogin:j_idt25',
+                'formLogin' => 'formLogin',
+                'formLogin:username' => $this->login,
+                'formLogin:password' => $this->password,
+                'javax.faces.ViewState' => $this->viewStateLogin
             ];
 
             $promise = $this->client->requestAsync('POST',
-                $this->urlLogin, [
+                'https://intranet2.expressosaomiguel.com.br/index.xhtml', [
                     'form_params' => $parameters,
                     'headers' => $headers
                 ])
@@ -135,11 +109,36 @@ abstract class TamCargoAuth
                                         $doc->loadHTML($response->getBody());
                                         libxml_use_internal_errors($libxml_previous_state);
                                         $xpath = new \DOMXpath($doc);
+
+
+
+                                        $this->result->status = null;
+                                        $this->result->errors = [];
+
+                                    });
+            $promise->wait();
+        } catch (RequestException $e) {
+            $this->result->status = 'ERROR';
+            $this->result->errors[] = 'Curl Error: ' . $e->getMessage();
+        }
+    }
+
+
+    private function getViewState()
+    {
+        try {
+
+            $promise = $this->client->requestAsync('GET',
+                'https://intranet2.expressosaomiguel.com.br/')
+                                    ->then(function($response) {
+                                        $doc = new \DOMDocument();
+                                        $libxml_previous_state = libxml_use_internal_errors(true);
+                                        $doc->loadHTML($response->getBody());
+                                        libxml_use_internal_errors($libxml_previous_state);
+                                        $xpath = new \DOMXpath($doc);
                                         $this->viewStateLogin = $xpath->query('//*[@name="javax.faces.ViewState"]')
                                                                         ->item(0)
                                                                         ->getAttribute('value');
-                                        $this->result->status = null;
-                                        $this->result->errors = [];
                                     });
             $promise->wait();
         } catch (RequestException $e) {

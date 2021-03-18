@@ -14,11 +14,11 @@ Shipping é um conjunto de classes otimizadas para obter cotações de envio e i
 
 ### Shipping Companies (Empresas de transporte)
 
-- TNT Mercúrio (Quote)
-- Jamef Encomendas Urgentes (Quote)
-- JadLog (Quote and Tracking)
-- Correios (Quote)
-- Tam Cargo (Quote) - Tam Cargo don't provide a official webservice to quote, so this class is unstable and not recommended to implementation (Tam Cargo não fornece um webservice oficial para cotação, portanto essa classe é instável e não é recomendada para implementação)
+- TNT Mercúrio (Quote and Tracking - last occurrence)
+- Jamef Encomendas Urgentes (Quote and Tracking)
+- Correios (Quote and Tracking)
+- Tam Cargo (Quote) - Tam Cargo don't provide a official webservice to quote, so this class is unstable and not recommended to production implementation (Tam Cargo não fornece um webservice oficial para cotação, portanto essa classe é instável e não é recomendada para implementação em produção)
+- Expresso São Miguel (Quote) - Expresso São Miguel don't provide a official webservice to quote, so this class is unstable and not recommended to production implementation (Expresso São Miguel não fornece um webservice oficial para cotação, portanto essa classe é instável e não é recomendada para implementação em produção)
 
 ## Installation
 
@@ -78,25 +78,6 @@ $jamef->makeRequest();
 $return = $jamef->getResult();
 ```
 
-#### Quote with Jadlog
-
-```php
-<?php
-require __DIR__ . "/vendor/autoload.php";
-
-use Trixpua\Shipping\Jadlog\Quote\Jadlog;
-use Trixpua\Shipping\ShippingInfo;
-
-$jadlog = new Jadlog('YOUR-ZIP-CODE','yourPassword', 'YOUR-TAX-ID');
-
-$shippingInfo = new ShippingInfo('DESTINY-ZIP-CODE', 'WEIGHT', 'COMMODITY-VALUE', 'VOLUME');
-$jadlog->setData($shippingInfo);
-
-$jadlog->makeRequest();
-
-$return = $jadlog->getResult();
-```
-
 #### Quote with Correios
 
 ```php
@@ -135,6 +116,25 @@ $tam->makeRequest();
 $return = $tam->getResult();
 ```
 
+#### Quote with Expresso São Miguel
+
+```php
+<?php
+require __DIR__ . "/vendor/autoload.php";
+
+use Trixpua\Shipping\ExpressoSaoMiguel\Quote\ExpressoSaoMiguel;
+use Trixpua\Shipping\ShippingInfo;
+
+$expressoSaoMiguel = new ExpressoSaoMiguel('YOUR-ZIP-CODE','yourUser', 'yourPassword');
+
+$shippingInfo = new ShippingInfo('DESTINY-ZIP-CODE', 'WEIGHT', 'COMMODITY-VALUE', 'VOLUME');
+$expressoSaoMiguel->setData($shippingInfo);
+
+$expressoSaoMiguel->makeRequest();
+
+$return = $expressoSaoMiguel->getResult();
+```
+
 #### Track with TNT
 
 ```php
@@ -155,30 +155,34 @@ $return = $tnt->getResult();
 #### Track with Jamef
 
 ```php
-TODO
-```
-
-#### Track with Jadlog
-
-```php
 <?php
 require __DIR__ . "/vendor/autoload.php";
 
-use Trixpua\Shipping\Jadlog\Tracking\Jadlog;
+use Trixpua\Shipping\Jamef\Tracking\Jamef;
 
-$jadlog = new Jadlog('yourPassword', 'YOUR-TAX-ID');
+$jamef = new Jamef('yourUsername', 'yourPassword', '00.000.000.0000-00');
 
-$jadlog->setData('INVOICE-NUMBER');
+$jamef->setData('INVOICE-NUMBER');
 
-$jadlog->makeRequest();
+$jamef->makeRequest();
 
-$return = $jadlog->getResult();
+$return = $jamef->getResult();
 ```
 
 #### Track with Correios
 
 ```php
-TODO
+require __DIR__ . "/vendor/autoload.php";
+
+use Trixpua\Shipping\Correios\Tracking\Correios;
+
+$correios = new Correios();
+
+$correios->setData(['TRACKING-NUMBERS']);
+
+$correios->makeRequest();
+
+$return = $correios->getResult();
 ```
 
 ## Contributing
@@ -187,9 +191,9 @@ Please see [CONTRIBUTING](https://github.com/Trixpua/shipping/blob/master/CONTRI
 
 ## Support
 
-###### Security: If you discover any security related issues, please email trix.pua@msn.com instead of using the issue tracker.
+###### Security: If you discover any security related issues, please open an issue.
 
-Se você descobrir algum problema relacionado à segurança, envie um e-mail para trix.pua@msn.com ao invés de usar o rastreador de problemas.
+Se você descobrir algum problema relacionado à segurança, por favor abra uma issue.
 
 Thank you
 

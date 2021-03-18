@@ -12,11 +12,10 @@ use Trixpua\Shipping\ShippingInfo;
  * Class Tnt
  * @author Elizandro Echer <https://github.com/Trixpua>
  * @package Trixpua\Shipping
- * @version 2.0.2
+ * @version 2.0.6
  */
 class Tnt
 {
-
     /** @var string */
     private $senderZipCode;
 
