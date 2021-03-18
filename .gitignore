@@ -173,3 +173,4 @@ $RECYCLE.BIN/
 examples/quote/Jadlog.php
 examples/tracking/Jadlog.php
 src/Jadlog/
+src/Correios/Tracking/CorreiosOld.php
