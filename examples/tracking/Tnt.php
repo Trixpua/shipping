@@ -6,7 +6,7 @@ use Trixpua\Shipping\Tnt\Tracking\Tnt;
 
 $tnt = new Tnt('yourlogin@email.com', '00.000.000.0000-00');
 
-$tnt->setData(8114);
+$tnt->setData(10456);
 
 $tnt->makeRequest();
 

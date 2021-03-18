@@ -19,15 +19,23 @@
       "role": "Developer"
     }
   ],
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/trixpua/async-soap-guzzle"
+    }
+  ],
   "require": {
     "php": "^7.2",
-    "guzzlehttp/guzzle": "^6.5",
-    "meng-tian/async-soap-guzzle": "^0.2",
+    "guzzlehttp/guzzle": "^7.0.1",
     "ext-json": "*",
     "ext-dom": "*",
     "ext-libxml": "*",
     "ext-soap": "*",
-    "ext-simplexml": "*"
+    "ext-simplexml": "*",
+    "clue/soap-react": "^2.0",
+    "meng-tian/async-soap-guzzle": "dev-master",
+    "ext-mbstring": "*"
   },
   "autoload": {
     "psr-4": {

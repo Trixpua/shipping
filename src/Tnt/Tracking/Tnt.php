@@ -11,7 +11,7 @@ use Meng\AsyncSoap\Guzzle\Factory;
  * Class Tnt
  * @author Elizandro Echer <https://github.com/Trixpua>
  * @package Trixpua\Shipping
- * @version 2.0.0
+ * @version 2.0.6
  */
 class Tnt
 {
@@ -107,6 +107,8 @@ class Tnt
     {
         $factory = new Factory();
         $client = $factory->create(new Client(), 'https://ws.tntbrasil.com.br/tntws/Localizacao?wsdl');
+
+        var_dump($this->buildRequest());
         try {
             $promise = $client->callAsync('localizaMercadoria', $this->buildRequest())->then(function ($response) {
                 $this->parseResult($response);
@@ -128,9 +130,9 @@ class Tnt
             'localizaMercadoria' => [
                 'in0' => [
                     'cnpj' => new \SoapVar($this->senderTaxId, XSD_STRING, 'string', null, 'cnpj', 'http://model.localizacao.mercurio.com'),
-                    'nf' => $this->invoiceNumber ? new \SoapVar($this->invoiceNumber, XSD_INT, 'int', null, 'nf', 'http://model.localizacao.mercurio.com'): '?',
-                    'nfSerie' => $this->invoiceSeries ? new \SoapVar($this->invoiceSeries, XSD_STRING, 'string', null, 'nfSerie', 'http://model.localizacao.mercurio.com') : '?',
-                    'pedido' => $this->orderNumber ? new \SoapVar($this->orderNumber, XSD_INT, 'int', null, 'pedido', 'http://model.localizacao.mercurio.com') : '?',
+                    'nf' => $this->invoiceNumber ? new \SoapVar($this->invoiceNumber, XSD_INT, 'int', null, 'nf', 'http://model.localizacao.mercurio.com'): new \SoapVar('?', XSD_STRING, 'string', null, 'nf', 'http://model.localizacao.mercurio.com'),
+                    'nfSerie' => $this->invoiceSeries ? new \SoapVar($this->invoiceSeries, XSD_INT, 'string', null, 'nfSerie', 'http://model.localizacao.mercurio.com') : $this->invoiceNumber ? new \SoapVar('1', XSD_STRING, 'string', null, 'nfSerie', 'http://model.localizacao.mercurio.com') : new \SoapVar('?', XSD_STRING, 'string', null, 'pedido', 'http://model.localizacao.mercurio.com'),
+                    'pedido' => $this->orderNumber ? new \SoapVar($this->orderNumber, XSD_INT, 'int', null, 'pedido', 'http://model.localizacao.mercurio.com') : new \SoapVar('?', XSD_STRING, 'string', null, 'pedido', 'http://model.localizacao.mercurio.com'),
                     'usuario' => new \SoapVar($this->login, XSD_STRING, 'string', null, 'usuario', 'http://model.localizacao.mercurio.com'),
                 ]
             ]
