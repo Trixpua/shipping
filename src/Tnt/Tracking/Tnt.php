@@ -5,6 +5,8 @@ namespace Trixpua\Shipping\Tnt\Tracking;
 
 use GuzzleHttp\Client;
 use Meng\AsyncSoap\Guzzle\Factory;
+use Laminas\Diactoros\RequestFactory;
+use Laminas\Diactoros\StreamFactory;
 
 
 /**
@@ -106,7 +108,7 @@ class Tnt
     public function makeRequest(): void
     {
         $factory = new Factory();
-        $client = $factory->create(new Client(), 'https://ws.tntbrasil.com.br/tntws/Localizacao?wsdl');
+        $client = $factory->create(new Client(), new StreamFactory(), new RequestFactory(), 'https://ws.tntbrasil.com.br/tntws/Localizacao?wsdl');
 
         var_dump($this->buildRequest());
         try {
