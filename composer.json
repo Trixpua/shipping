@@ -28,8 +28,9 @@
     "ext-soap": "*",
     "ext-simplexml": "*",
     "clue/soap-react": "^2.0",
-    "meng-tian/async-soap-guzzle": "v0.4.0",
-    "ext-mbstring": "*"
+    "ext-mbstring": "*",
+    "meng-tian/async-soap-guzzle": "^0.4.0",
+    "laminas/laminas-diactoros": "2.*"
   },
   "autoload": {
     "psr-4": {
