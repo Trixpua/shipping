@@ -541,7 +541,6 @@ class TamCargo extends TamCargoSetParameters
             $redispatchTime = intval($xpath->query('//*[@id="form:j_idt83"]')->item(0)->getAttribute('value'));
         }
 
-        $deliveryTime = ['CONVENCIONAL' => '3', 'PROXIMO DIA' => '2', 'PROXIMO VOO' => '1', 'PREPAGO' => '2'];
         $this->result->modals = new \stdClass();
         $trs = $xpath->query('//*[@id="form:quotationTableId_data"]/tr');
         foreach ($trs as $modkey => $tr) {
@@ -549,10 +548,10 @@ class TamCargo extends TamCargoSetParameters
             $this->result->modals->{$modkey}->status = '';
             $this->result->modals->{$modkey}->modal = $tr->childNodes->item(0)->nodeValue;
             $this->result->modals->{$modkey}->shippingCost = number_format((($tr->childNodes->item(7)->nodeValue + $this->shippingInfo->getAdditionalCharge()) / (1 - ($this->shippingInfo->getAdditionalPercent() / 100))), 2, '.', '');
-            $this->result->modals->{$modkey}->deliveryTime = $deliveryTime[$tr->childNodes->item(0)->nodeValue] + $redispatchTime + $this->shippingInfo->getShipmentDelay();
+            $this->result->modals->{$modkey}->deliveryTime = $redispatchTime + $this->shippingInfo->getShipmentDelay();
             $this->result->modals->{$modkey}->originAirport = $this->originAirport;
             $this->result->modals->{$modkey}->destinyAirport = $this->destinyAirport;
-            $this->result->modals->{$modkey}->redispatch = $redispatchTime ? true : false;
+            $this->result->modals->{$modkey}->redispatch = (bool)$redispatchTime;
             $this->result->modals->{$modkey}->parcels = new \stdClass();
             $this->result->modals->{$modkey}->parcels->shipping = $tr->childNodes->item(1)->nodeValue;
             $this->result->modals->{$modkey}->parcels->rate = $tr->childNodes->item(2)->nodeValue;
