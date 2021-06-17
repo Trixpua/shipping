@@ -4,6 +4,8 @@ namespace Trixpua\Shipping\Tnt\Quote;
 
 
 use GuzzleHttp\Client;
+use Laminas\Diactoros\RequestFactory;
+use Laminas\Diactoros\StreamFactory;
 use Meng\AsyncSoap\Guzzle\Factory;
 use Trixpua\Shipping\ShippingInfo;
 
@@ -259,7 +261,7 @@ class Tnt
     {
 
         $factory = new Factory();
-        $client = $factory->create(new Client(), 'https://ws.tntbrasil.com.br/tntws/CalculoFrete?wsdl');
+        $client = $factory->create(new Client(), new StreamFactory(), new RequestFactory(), 'https://ws.tntbrasil.com.br/tntws/CalculoFrete?wsdl');
 
         try {
             $this->setQuoteWeight();
